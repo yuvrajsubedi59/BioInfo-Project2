@@ -90,7 +90,7 @@ def get_alignment_matrix(gene1, gene2):
         while x < g2_len:
             #print("i:",i,", j:",j)
             #diagonel score
-            diag = gene_matx[y-1][x-1] +  (match,mismatch) [gene1[y-1] == gene2[x-1]]
+            diag = gene_matx[y-1][x-1] +  (mismatch,match) [gene1[y-1] == gene2[x-1]]
             #vertical score
             vert = gene_matx[y][x-1] + gap
             #horisontal score
@@ -98,6 +98,10 @@ def get_alignment_matrix(gene1, gene2):
             #get max score
             gene_matx[y][x] = max(diag, vert, hori)
             #store direction
+            print("vert: ",vert,", diag: ", diag, ", hori: ",hori)
+            print("g1", gene1[y-1])
+            print("g2", gene2[x-1])
+            print((mismatch,match) [gene1[y-1] == gene2[x-1]])
             if diag == gene_matx[y][x]:
                 gene_matx_dir[y][x] = "d"
             elif x>y:
@@ -148,6 +152,15 @@ def trace_back(gene_matxs,gene1,gene2):
         else:
             x -= 1
         print("x:",x,", y:",y)
+    #finish the alignment
+    while y>0:
+        g1_align = gene1[y-1] + g1_align
+        g2_align = "_" + g2_align
+        y -= 1
+    while x>0:
+        g1_align = "_" + g1_align
+        g2_align = gene2[x-1] + g2_align
+        x -= 1
     print(g1_align)
     print(g2_align)
     return (g1_align,g2_align)
