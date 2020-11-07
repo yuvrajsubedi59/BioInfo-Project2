@@ -6,19 +6,21 @@ import os
 import numpy
 
 def main():
-    #cov_nsp1 = get_cov()
-    #mers_nsp1 = get_mers()
+    cov_nsp1 = get_cov()
+    mers_nsp1 = get_mers()
     #short sequences for testing
-    cov_nsp1 = "GCATGCAT"
-    mers_nsp1 = "CATTCAT"
-    print(cov_nsp1)
+    #cov_nsp1 = "GCATGCAT"
+    #mers_nsp1 = "CATTCAT"
     print(mers_nsp1)
-    gene_matx=get_alignment_matrix(cov_nsp1, mers_nsp1)
-    for x in gene_matx[0]:
-        print(x)
-    for x in gene_matx[1]:
-        print(x)
-    trace_back(gene_matx,cov_nsp1, mers_nsp1)
+    print(cov_nsp1)
+    gene_matx=get_alignment_matrix(mers_nsp1, cov_nsp1)
+    #for x in gene_matx[0]:
+    #    print(x)
+    #for x in gene_matx[1]:
+    #    print(x)
+    alignment=trace_back(gene_matx, mers_nsp1, cov_nsp1)
+    print(alignment)
+    print(get_stats(alignment[0],alignment[1]))
 
 #function to get the covid gene
 #parameters: none
@@ -98,10 +100,10 @@ def get_alignment_matrix(gene1, gene2):
             #get max score
             gene_matx[y][x] = max(diag, vert, hori)
             #store direction
-            print("vert: ",vert,", diag: ", diag, ", hori: ",hori)
-            print("g1", gene1[y-1])
-            print("g2", gene2[x-1])
-            print((mismatch,match) [gene1[y-1] == gene2[x-1]])
+            #print("vert: ",vert,", diag: ", diag, ", hori: ",hori)
+            #print("g1", gene1[y-1])
+            #print("g2", gene2[x-1])
+            #print((mismatch,match) [gene1[y-1] == gene2[x-1]])
             if diag == gene_matx[y][x]:
                 gene_matx_dir[y][x] = "d"
             elif x>y:
@@ -120,10 +122,10 @@ def get_alignment_matrix(gene1, gene2):
 def trace_back(gene_matxs,gene1,gene2):
     gene_matx = gene_matxs[0]
     gene_matx_dir = gene_matxs[1]
-    for x in gene_matx:
-        print(x)
-    for x in gene_matx_dir:
-        print(x)
+    #for x in gene_matx:
+        #print(x)
+    #for x in gene_matx_dir:
+        #print(x)
     x_len = len(gene_matx[0])
     y_len = len(gene_matx)
     print('x length:',x_len,", y length:" ,y_len)
@@ -131,11 +133,11 @@ def trace_back(gene_matxs,gene1,gene2):
     y = y_len-1
     #x = len(gene2)
     #y = len(gene1)
-    print("x:",x,", y:",y)
+    #print("x:",x,", y:",y)
     g1_align = ""
     g2_align = ""
     while y > 0 and x > 0:
-        print("x:",x,", y:",y, ", dir:", gene_matx_dir[y][x] )
+        #print("x:",x,", y:",y, ", dir:", gene_matx_dir[y][x] )
         if gene_matx_dir[y][x] == "d":
             g1_align = gene1[y-1] + g1_align
             g2_align = gene2[x-1] + g2_align
@@ -151,7 +153,7 @@ def trace_back(gene_matxs,gene1,gene2):
                 y -= 1
         else:
             x -= 1
-        print("x:",x,", y:",y)
+        #print("x:",x,", y:",y)
     #finish the alignment
     while y>0:
         g1_align = gene1[y-1] + g1_align
@@ -161,10 +163,34 @@ def trace_back(gene_matxs,gene1,gene2):
         g1_align = "_" + g1_align
         g2_align = gene2[x-1] + g2_align
         x -= 1
-    print(g1_align)
-    print(g2_align)
+    #print(g1_align)
+    #print(g2_align)
     return (g1_align,g2_align)
 
+def get_stats(gene1, gene2):
+    i=0
+    #get reading frame
+    while i< len(gene1)-3:
+        if gene1[i:i+3]=="ATG" :
+            print(i)
+            break
+        i += 1
+    #go through all the codons
+    same_cod=0
+    indel = 0
+    while i< len(gene1)-3:
+        print(gene1[i:i+3],gene2[i:i+3])
+        if gene1[i:i+3] == gene2[i:i+3]:
+            print("same******")
+            same_cod += 1
+        elif "_" in gene2[i:i+3]:
+            indel +=1
+            print("indel*****")
+        elif
+            #implement similar/ disimilar mutations
+        i+=3
+    print("same: ", same_cod, ", indel: ", indel)
+    return
 
 #run main when script is run
 if __name__ == "__main__":
