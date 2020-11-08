@@ -1,0 +1,19 @@
+phe, phe, leu, leu
+ser, ser, ser, ser
+tyr, tyr, stop, stop
+cys, cys, stop, trp
+
+leu, leu, leu, leu
+pro, pro, pro, pro
+his, his, gln, gln
+arg, arg, arg, arg
+
+lle, lle, lle, met
+thr, thr, thr, thr
+asn, asn, lys, lys
+ser, ser, arg, arg
+
+val, val, val, val
+ala, ala, ala, ala
+asp, asp, glu, glu
+gly, gly, gly, gly
