@@ -1,31 +1,26 @@
 # Intro to BioInformatics
 # Project 2
-# By Yuvraj Subedi, Prakash Biswa, and Fred Fikter
+# By            and Fred Fikter
 
 import os
 import numpy
 
 def main():
-    # get SARS CoV-2 nsp1 gene
     cov_nsp1 = get_cov()
-    # get MERS CoV nsp1 gene
     mers_nsp1 = get_mers()
-    print("MERS nsp1:")
+    #short sequences for testing
+    #cov_nsp1 = "GCATGCAT"
+    #mers_nsp1 = "CATTCAT"
     print(mers_nsp1)
-    print()
-    print("SARS CoV2 nsp1: ")
     print(cov_nsp1)
-    print()
-    print()
-
     gene_matx=get_alignment_matrix(mers_nsp1, cov_nsp1)
-
-    # trace back
+    #for x in gene_matx[0]:
+    #    print(x)
+    #for x in gene_matx[1]:
+    #    print(x)
     alignment=trace_back(gene_matx, mers_nsp1, cov_nsp1)
-    print("Two genes alignment: \n")
     for x in alignment:
         print(x)
-        print()
     print(get_stats(alignment[0],alignment[1]))
 
 #function to get the covid gene
@@ -69,7 +64,7 @@ def get_mers():
 #returns: a tuple of matrixes with the comparisons and direction
 def get_alignment_matrix(gene1, gene2):
     #alignment scores
-    gap = -1
+    gap = -2
     mismatch = -1
     match = 1
     #get length plus one for size of matrix
@@ -96,20 +91,20 @@ def get_alignment_matrix(gene1, gene2):
     while y < g1_len:
         x=1
         while x < g2_len:
-
+            #print("i:",i,", j:",j)
             #diagonel score
             diag = gene_matx[y-1][x-1] +  (mismatch,match) [gene1[y-1] == gene2[x-1]]
-            
             #vertical score
             vert = gene_matx[y][x-1] + gap
-            
             #horisontal score
             hori = gene_matx[y-1][x] + gap
-            
             #get max score
             gene_matx[y][x] = max(diag, vert, hori)
-            
             #store direction
+            #print("vert: ",vert,", diag: ", diag, ", hori: ",hori)
+            #print("g1", gene1[y-1])
+            #print("g2", gene2[x-1])
+            #print((mismatch,match) [gene1[y-1] == gene2[x-1]])
             if diag == gene_matx[y][x]:
                 gene_matx_dir[y][x] = "d"
             elif x>y:
@@ -128,16 +123,22 @@ def get_alignment_matrix(gene1, gene2):
 def trace_back(gene_matxs,gene1,gene2):
     gene_matx = gene_matxs[0]
     gene_matx_dir = gene_matxs[1]
-
+    #for x in gene_matx:
+        #print(x)
+    #for x in gene_matx_dir:
+        #print(x)
     x_len = len(gene_matx[0])
     y_len = len(gene_matx)
-
+    #print('x length:',x_len,", y length:" ,y_len)
     x = x_len-1
     y = y_len-1
-
+    #x = len(gene2)
+    #y = len(gene1)
+    #print("x:",x,", y:",y)
     g1_align = ""
     g2_align = ""
     while y > 0 and x > 0:
+        #print("x:",x,", y:",y, ", dir:", gene_matx_dir[y][x] )
         if gene_matx_dir[y][x] == "d":
             g1_align = gene1[y-1] + g1_align
             g2_align = gene2[x-1] + g2_align
@@ -153,7 +154,7 @@ def trace_back(gene_matxs,gene1,gene2):
                 y -= 1
         else:
             x -= 1
-
+        #print("x:",x,", y:",y)
     #finish the alignment
     while y>0:
         g1_align = gene1[y-1] + g1_align
@@ -163,7 +164,8 @@ def trace_back(gene_matxs,gene1,gene2):
         g1_align = "_" + g1_align
         g2_align = gene2[x-1] + g2_align
         x -= 1
-
+    #print(g1_align)
+    #print(g2_align)
     return (g1_align,g2_align)
 
 def get_stats(gene1, gene2):
@@ -171,9 +173,9 @@ def get_stats(gene1, gene2):
     #get reading frame
     while i< len(gene1)-3:
         if gene1[i:i+3]=="ATG" :
+            #print(i)
             break
         i += 1
-    
     #go through all the codons
     codons = 0
     same_cod = 0
@@ -184,30 +186,30 @@ def get_stats(gene1, gene2):
         codons +=1
         g1_codon =gene1[i:i+3]
         g2_codon =gene2[i:i+3]
-
+        #print(g1_codon,g2_codon)
         if g1_codon == g2_codon:
+            #print("same******")
             same_cod += 1
         elif "_" in g2_codon or "_" in g1_codon :
             indel +=1
+            #print("indel*****")
         else:
             is_syn = codon_similarity(g1_codon,g2_codon)
             syn_mut += (0,1)[is_syn]
             nsyn_mut += (1,0)[is_syn]
             #implement similar/ disimilar mutations
         i+=3
-    print("Codons: ",codons)
-    print("Identical codons: ", same_cod)
-    print("Indel: ", indel)
-    print("Synonymous: ", syn_mut)
-    print("Nonsynonymous: ", nsyn_mut )
+    print("codons: ",codons)
+    print("Identical codons: ", same_cod, ", indel: ", indel)
+    print("synonymous: ", syn_mut, "nonsynonymous: ", nsyn_mut )
     return
-
 #returns 1 if codons are synonymous
 #        0 if codons are nonsynonymous
 def codon_similarity(g1_codon, g2_codon):
     codons = numpy.loadtxt("codons.txt", dtype = numpy.str)
     codons=codons.reshape(4,4,4)
-
+    #print(codons)
+    #print(g1_codon, g2_codon)
     g1_codon=g1_codon.replace("T","0")
     g2_codon=g2_codon.replace("T","0")
     g1_codon=g1_codon.replace("C","1")
@@ -216,9 +218,10 @@ def codon_similarity(g1_codon, g2_codon):
     g2_codon=g2_codon.replace("A","2")
     g1_codon=g1_codon.replace("G","3")
     g2_codon=g2_codon.replace("G","3")
-
+    #print(g1_codon, g2_codon)
     g1=codons[int(g1_codon[0]),int(g1_codon[1]),int(g1_codon[2])]
     g2=codons[int(g2_codon[0]),int(g2_codon[1]),int(g2_codon[2])]
+    #print(g1,g2)
 
     return g1 == g2;
 
