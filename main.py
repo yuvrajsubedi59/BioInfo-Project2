@@ -1,6 +1,6 @@
 # Intro to BioInformatics
 # Project 2
-# By            and Fred Fikter
+# By Yuvraj Subedi, Prakash Biswa, and Fred Fikter
 
 import os
 import numpy
